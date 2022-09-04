@@ -1,6 +1,25 @@
 
-# loki-frontend
+# Loki Frontend
 Sistema de gestão financeiro pessoal
+
+![image](https://user-images.githubusercontent.com/59855397/188309296-3c508a69-5818-43eb-9c68-fe675e79cf39.png)
+
+# Dashboard Interativo
+
+![image](https://user-images.githubusercontent.com/59855397/188309309-c301beac-516c-4100-9cb0-2f62985d9a9e.png)
+
+# Cadastro de Despesas e Receitas
+
+![image](https://user-images.githubusercontent.com/59855397/188309332-685540f9-7f96-4829-9991-1796f38afadb.png)
+
+# Calendário
+
+![image](https://user-images.githubusercontent.com/59855397/188309392-4fdf4caf-30bd-46fe-8bb6-1f98a36c4b17.png)
+
+# E muito mais...
+
+![image](https://user-images.githubusercontent.com/59855397/188309408-69b72a2f-63af-4d16-aa14-27fec812509c.png)
+
 
 # Getting Started with Create React App
 
