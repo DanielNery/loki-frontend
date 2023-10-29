@@ -1,0 +1,7 @@
+.placeholder-center::placeholder {
+    text-align: center;
+    /* Alinha o texto do placeholder no meio verticalmente */
+    transform: translateY(-50%);
+    /* Ajusta para centralizar verticalmente */
+  }
+  
