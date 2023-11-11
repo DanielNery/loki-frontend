@@ -141,14 +141,14 @@ export default function ColumnWithMarkers({title}: myColumnWithMarkersProps){
         xaxis: {
             labels: {
               style: {
-                colors: '#ffffff', // Define a cor do texto do eixo X para branco
+                colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
               }
             }
           },
           yaxis: {
             labels: {
               style: {
-                colors: '#ffffff', // Define a cor do texto do eixo Y para branco
+                colors: '#D3D3D3', // Define a cor do texto do eixo Y para branco
               }
             }
         },
@@ -158,7 +158,7 @@ export default function ColumnWithMarkers({title}: myColumnWithMarkersProps){
           offsetY: 50,
           align: 'center',
           style: {
-            color: '#fff'
+            color: '#D3D3D3'
           }
         },
         grid: {

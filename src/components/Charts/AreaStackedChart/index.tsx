@@ -67,7 +67,7 @@ export default function AreaStackedChart({title}: myAreaStackedChartProps) {
             offsetY: 20,
             align: 'center',
             style: {
-              color: '#fff'
+              color: '#D3D3D3'
             }
         },
         colors: ['#15c16b', '#00E396', '#FFD700'],
@@ -93,14 +93,14 @@ export default function AreaStackedChart({title}: myAreaStackedChartProps) {
             type: 'datetime',
             labels: {
                 style: {
-                  colors: '#ffffff', // Define a cor do texto do eixo X para branco
+                  colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
                 }
             }
         },
         yaxis: {
         labels: {
             style: {
-            colors: '#ffffff', // Define a cor do texto do eixo Y para branco
+            colors: '#D3D3D3', // Define a cor do texto do eixo Y para branco
             }
         }
         },

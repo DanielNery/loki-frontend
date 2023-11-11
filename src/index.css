@@ -18,3 +18,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Adapte as cores e a espessura conforme necessário */
+::-webkit-scrollbar {
+  width: 12px; /* Largura do scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4CAF50; /* Cor do thumb (a parte móvel) */
+  border-radius: 10px; /* Raio das bordas do thumb */
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Cor da trilha (a parte fixa) */
+}

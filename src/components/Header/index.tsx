@@ -21,7 +21,7 @@ export default function Header() {
 
     return(
         
-        <div className="flex justify-between m-10">
+        <div className="flex justify-between dark:bg-slate-950 dark:bg-opacity-50 bg-white mb-10 p-10 ">
             
             <div>
                 <FontAwesomeIcon icon={faBars} onClick={handleMenuToggle} />

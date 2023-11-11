@@ -26,21 +26,21 @@ export default function LineChart({color, title}: myLineChartProps) {
           offsetY: 50,
           align: 'center',
           style: {
-            color: '#fff'
+            color: '#D3D3D3'
           }
         },
         xaxis: {
           categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
           labels: {
             style: {
-              colors: '#ffffff', // Define a cor do texto do eixo X para branco
+              colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
             }
           }
         },
         yaxis: {
           labels: {
             style: {
-              colors: '#ffffff', // Define a cor do texto do eixo Y para branco
+              colors: '#D3D3D3', // Define a cor do texto do eixo Y para branco
             }
           }
         },

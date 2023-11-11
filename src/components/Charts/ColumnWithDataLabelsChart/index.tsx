@@ -44,7 +44,7 @@ export default function ColumnWithDataLabelsChart({title}: myColumnWithDataLabel
           position: 'top',
           labels: {
             style: {
-              colors: '#ffffff', // Define a cor do texto do eixo X para branco
+              colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
             }
           },
           axisBorder: {
@@ -79,7 +79,7 @@ export default function ColumnWithDataLabelsChart({title}: myColumnWithDataLabel
           labels: {
             show: false,
             style: {
-                colors: '#ffffff', // Define a cor do texto do eixo X para branco
+                colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
             },
             formatter: function (val) {
               return val + "%";
@@ -93,7 +93,7 @@ export default function ColumnWithDataLabelsChart({title}: myColumnWithDataLabel
           offsetY: 330,
           align: 'center',
           style: {
-            color: '#fff'
+            color: '#D3D3D3'
           }
         },
         grid: {
