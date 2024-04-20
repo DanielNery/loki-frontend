@@ -23,7 +23,7 @@ export default function SideBar({ isOpen  }: SidebarProps) {
                 </Link>
               </li>
               <li>
-                <Link to="/entry" className="flex items-center px-4 py-2 text-black dark:text-gray-500 hover:bg-gray-700 hover:text-white">
+                <Link to="/entries" className="flex items-center px-4 py-2 text-black dark:text-gray-500 hover:bg-gray-700 hover:text-white">
                   Lançamentos
                 </Link>
               </li>
