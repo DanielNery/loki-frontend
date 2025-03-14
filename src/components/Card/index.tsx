@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 interface myCardInterface {
     title: string,
-    value: string | number,
+    value: any,
     IconComponent?: ReactNode
 }
 
@@ -16,7 +16,7 @@ export default function Card({ title, value, IconComponent }: myCardInterface) {
             </div>
 
             <div className="flex flex-row justify-center mt-5 text-3xl font-bold">
-                R$ {value}
+                {value}
             </div>
 
         </div>

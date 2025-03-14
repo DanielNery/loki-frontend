@@ -8,13 +8,14 @@ import { faMoneyBillTransfer } from "@fortawesome/free-solid-svg-icons";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface myGridPropsInterface {
-    id: number,
+    id: number | string,
     title: string,
     value: number,
-    type: string,
+    type: string | undefined,
+    icon: undefined | any
 }
 
-export default function GridRowEntry({id, title, value, type}: myGridPropsInterface){
+export default function GridRowEntry({ id, title, value, type }: myGridPropsInterface) {
     const entryLink = `/entry/${id}`; // Construa o link com o ID da entrada
 
     return (
@@ -24,12 +25,12 @@ export default function GridRowEntry({id, title, value, type}: myGridPropsInterf
                     <span>{title}</span>
                     <span>{value}</span>
                     {
-                        type == "income" ? <span><FontAwesomeIcon icon={faArrowUpWideShort} /></span> : <span><FontAwesomeIcon icon={faArrowDownWideShort} className="text-red-600" /></span> 
+                        type == "income" ? <span><FontAwesomeIcon icon={faArrowUpWideShort} /></span> : <span><FontAwesomeIcon icon={faArrowDownWideShort} className="text-red-600" /></span>
                     }
                     <div className="flex flex-row justify-end">
                         <FontAwesomeIcon icon={faTrash} />
                     </div>
-                    
+
 
                 </div>
             </div>

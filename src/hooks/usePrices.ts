@@ -10,7 +10,7 @@ export function usePrices() {
     useEffect(() => {
         const fetchPrices = async () => {
             try {
-                const response = await api.get<PricesResponse>('/api/v1/prices');
+                const response = await api.get<PricesResponse>('/api/v1/exchanges');
                 setPrices(response.data);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to fetch prices'));
