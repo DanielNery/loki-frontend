@@ -105,7 +105,7 @@ export default function Home() {
                         <LoadingSpinner />
                     ) : (
                         <>
-                            <Card title="Saldo Total" value={balance ? parseFloat(balance.saldo) : 0} />
+                            <Card title="Saldo Total" value={balance ? balance.saldo : 0} />
                         </>
                     )}
                     {balanceError && <p className="text-red-500">Failed to fetch balance</p>}
