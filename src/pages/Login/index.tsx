@@ -13,7 +13,7 @@ export default function Login() {
     setError('');
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/v1/login/access-token',
+        `${process.env.REACT_APP_API_URL}/api/v1/login/access-token`,
         { email, password },
         { headers: { 'Content-Type': 'application/json' } }
       );
