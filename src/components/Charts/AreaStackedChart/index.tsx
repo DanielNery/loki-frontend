@@ -18,48 +18,18 @@ function generateDayWiseTimeSeries(baseval: number, count: number, yrange: any) 
     return series;
 }
 
-interface myAreaStackedChartProps {
-    title: string
+interface AreaStackedChartProps {
+    title: string;
+    series: { name: string; data: number[] }[];
+    categories: string[];
 }
 
-export default function AreaStackedChart({title}: myAreaStackedChartProps) {
-    
-    
-
-    const series = [
-        {
-        name: 'Renda',
-        data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 20, {
-            min: 10,
-            max: 60
-        })
-        },
-        {
-        name: 'Investimentos',
-        data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 20, {
-            min: 10,
-            max: 20
-        })
-        },
-        {
-        name: 'Despesas',
-        data: generateDayWiseTimeSeries(new Date('11 Feb 2017 GMT').getTime(), 20, {
-            min: 10,
-            max: 15
-        })
-        }
-    ]
-
+export default function AreaStackedChart({ title, series, categories }: AreaStackedChartProps) {
     const options: ApexOptions = {
         chart: {
-        type: 'area',
-        height: 350,
-        stacked: true,
-        events: {
-            selection: function (chart, e) {
-            console.log(new Date(e.xaxis.min))
-            }
-        },
+            type: 'area',
+            height: 350,
+            stacked: true,
         },
         title: {
             text: title,
@@ -67,57 +37,49 @@ export default function AreaStackedChart({title}: myAreaStackedChartProps) {
             offsetY: 20,
             align: 'center',
             style: {
-              color: '#D3D3D3'
+                color: '#D3D3D3'
             }
         },
         colors: ['#15c16b', '#00E396', '#FFD700'],
         dataLabels: {
-        enabled: false
+            enabled: false
         },
         stroke: {
-        curve: 'smooth'
+            curve: 'smooth'
         },
         fill: {
-        type: 'gradient',
-        gradient: {
-            opacityFrom: 0.6,
-            opacityTo: 0.8,
-        }
+            type: 'gradient',
+            gradient: {
+                opacityFrom: 0.6,
+                opacityTo: 0.8,
+            }
         },
         legend: {
-        position: 'top',
-        horizontalAlign: 'left'
+            position: 'top',
+            horizontalAlign: 'left'
         },
-        
         xaxis: {
-            type: 'datetime',
+            categories: categories,
             labels: {
                 style: {
-                  colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
+                    colors: '#D3D3D3',
                 }
             }
         },
         yaxis: {
-        labels: {
-            style: {
-            colors: '#D3D3D3', // Define a cor do texto do eixo Y para branco
+            labels: {
+                style: {
+                    colors: '#D3D3D3',
+                }
             }
-        }
         },
         grid: {
-        show: false // Oculta as grades do gráfico
+            show: false
         },
-    }
-    
-
-
-
+    };
     return (
-        
         <div id="chart">
             <ReactApexChart options={options} series={series} type="area" height={350} />
         </div>
-        
     );
-
 }

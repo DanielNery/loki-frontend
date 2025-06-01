@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import Card from "../../components/Card";
 import { usePrices } from "../../hooks/usePrices";
-import { usePix } from "../../hooks/usePix";
 import { useBalance } from "../../hooks/useBalance";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
+import { api } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
 
 import LineChart from "../../components/Charts/LineChart";
 import ColumnWithDataLabelsChart from "../../components/Charts/ColumnWithDataLabelsChart";
 import ColumnWithMarkers from "../../components/Charts/ColumnWithMarkers";
 import AreaStackedChart from "../../components/Charts/AreaStackedChart";
 import SimplePieChart from "../../components/Charts/SimplePieChart";
+import BarChart from "../../components/Charts/BarChart";
+import HabitsDonutChart from "../../components/Charts/HabitsDonutChart";
 
 import './styles.css';
 
@@ -19,144 +22,342 @@ interface TransactionData {
     value: number;
 }
 
-const groupByMonth = (data: TransactionData[]) => {
-    const groupedData: { [key: string]: number } = {};
-
-    data.forEach(item => {
-        const month = item.date.slice(0, 7); // Extract the year and month (YYYY-MM)
-        if (!groupedData[month]) {
-            groupedData[month] = 0;
-        }
-        groupedData[month] += item.value;
-    });
-
-    return Object.keys(groupedData).map(month => ({
-        date: month,
-        value: groupedData[month]
+// Função utilitária para converter o resumo mensal em array para gráficos
+function resumeToSeries(resume: any, key: string) {
+    if (!resume) return [];
+    return Object.entries(resume).map(([date, obj]: [string, any]) => ({
+        date,
+        value: obj[key] || 0
     }));
-};
+}
+
+// Função para preparar dados para o AreaStackedChart
+function getAreaStackedSeries(resume: any) {
+    if (!resume) return [];
+    const meses = Object.keys(resume);
+    return [
+        {
+            name: 'Compras',
+            data: meses.map(m => resume[m].compras || 0)
+        },
+        {
+            name: 'Vendas',
+            data: meses.map(m => resume[m].vendas || 0)
+        },
+        {
+            name: 'Saldo Investido',
+            data: meses.map(m => resume[m].saldo_investido || 0)
+        }
+    ];
+}
+
+// Função para preparar categorias (meses)
+function getResumeMonths(resume: any) {
+    if (!resume) return [];
+    return Object.keys(resume);
+}
+
+// Função para preparar dados para o ColumnWithDataLabelsChart
+function getTotalsForColumnChart(totals: any) {
+    if (!totals) return { series: [], categories: [] };
+    const keys = [
+        { key: 'total_cdb', label: 'CDB' },
+        { key: 'total_crypto', label: 'Crypto' },
+        { key: 'total_dolar', label: 'Dólar' },
+        { key: 'total_recebiveis', label: 'Recebíveis' }
+    ];
+    return {
+        series: [{
+            name: 'Total',
+            data: keys.map(k => totals[k.key] || 0)
+        }],
+        categories: keys.map(k => k.label)
+    };
+}
 
 export default function Home() {
     const { prices, loading: pricesLoading, error: pricesError } = usePrices();
-    const { pix, loading: pixLoading, error: pixError } = usePix(0, 1000, "2000-01-01T00:00:00.000Z", "2100-01-01T00:00:00.000Z");
     const { balance, loading: balanceLoading, error: balanceError } = useBalance();
+    const navigate = useNavigate();
 
-    const [incomeData, setIncomeData] = useState<TransactionData[]>([]);
-    const [expenseData, setExpenseData] = useState<TransactionData[]>([]);
+    const [investingTotals, setInvestingTotals] = useState<any>(null);
+    const [investingResume, setInvestingResume] = useState<any>(null);
+    const [investingLoading, setInvestingLoading] = useState(false);
+    const [investingError, setInvestingError] = useState('');
+
+    const [extractResume, setExtractResume] = useState<any>(null);
+    const [extractTotals, setExtractTotals] = useState<any>(null);
+    const [extractLoading, setExtractLoading] = useState(false);
+    const [extractError, setExtractError] = useState('');
+
+    const [maioresDespesas, setMaioresDespesas] = useState<any[]>([]);
+    const [maioresReceitas, setMaioresReceitas] = useState<any[]>([]);
+
+    const [notionResume, setNotionResume] = useState<any>(null);
+    const [notionLoading, setNotionLoading] = useState(false);
+    const [notionError, setNotionError] = useState('');
 
     useEffect(() => {
-        if (pix) {
-            const income = pix.filter(transaction => transaction.type === "received").map(transaction => ({
-                date: transaction.horario.liquidacao || transaction.horario.solicitacao || transaction.horario,
-                value: parseFloat(transaction.valor)
-            }));
-            const expenses = pix.filter(transaction => transaction.type === "send").map(transaction => ({
-                date: transaction.horario.liquidacao || transaction.horario.solicitacao || transaction.horario,
-                value: parseFloat(transaction.valor)
-            }));
-            setIncomeData(groupByMonth(income));
-            setExpenseData(groupByMonth(expenses));
-        }
-    }, [pix]);
+        setInvestingLoading(true);
+        api.get('/api/v1/investing/resume')
+            .then(res => {
+                setInvestingTotals(res.data.totais);
+                setInvestingResume(res.data.resumo_mensal);
+            })
+            .catch((err) => {
+                if (err?.response?.status === 403) navigate('/login');
+                setInvestingError('Erro ao buscar resumo de investimentos');
+            })
+            .finally(() => setInvestingLoading(false));
+    }, [navigate]);
+
+    useEffect(() => {
+        setExtractLoading(true);
+        api.get('/api/v1/extract/resume')
+            .then(res => {
+                setExtractResume(res.data.resumo_por_periodo);
+                setExtractTotals(res.data.total_geral);
+                setMaioresDespesas(res.data.maiores_despesas || []);
+                setMaioresReceitas(res.data.maiores_receitas || []);
+            })
+            .catch((err) => {
+                if (err?.response?.status === 403) navigate('/login');
+                setExtractError('Erro ao buscar resumo de receitas/despesas');
+            })
+            .finally(() => setExtractLoading(false));
+    }, [navigate]);
+
+    useEffect(() => {
+        setNotionLoading(true);
+        api.get('/api/v1/notion/resume')
+            .then(res => setNotionResume(res.data))
+            .catch((err) => {
+                if (err?.response?.status === 403) navigate('/login');
+                setNotionError('Erro ao buscar hábitos');
+            })
+            .finally(() => setNotionLoading(false));
+    }, [navigate]);
+
+    function extractToSeries(resume: any, key: string) {
+        if (!resume) return [];
+        return Object.entries(resume).map(([date, obj]: [string, any]) => ({
+            date,
+            value: obj[key] || 0
+        }));
+    }
+    function extractMonths(resume: any) {
+        if (!resume) return [];
+        return Object.keys(resume);
+    }
+    function getExtractAreaSeries(resume: any) {
+        if (!resume) return [];
+        const meses = Object.keys(resume);
+        return [
+            {
+                name: 'Receitas',
+                data: meses.map(m => resume[m].total_receitas || 0)
+            },
+            {
+                name: 'Despesas',
+                data: meses.map(m => resume[m].total_despesas || 0)
+            },
+            {
+                name: 'Investimentos',
+                data: meses.map(m => resume[m].total_investimentos || 0)
+            },
+            {
+                name: 'Saldo',
+                data: meses.map(m => resume[m].saldo || 0)
+            }
+        ];
+    }
 
     return (
         <div>
             <Header />
-            <div className="grid md:grid-cols-4 gap-4">
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    {pricesLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <>
-                            <Card title="Dólar/Real" value={prices ? prices.USDBRL : 0} />
-                            <Card title="Bitcoin/Real" value={prices ? prices.BTCBRL : 0} />
-                            <Card title="Dólar/Bitcoin" value={prices ? prices.USDBTC : 0} />
-                        </>
-                    )}
-                    {pricesError && <p className="text-red-500">Failed to fetch prices</p>}
-                </div>
-
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    {pixLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <LineChart color="#15c16b" title="Evolução de Renda" data={incomeData} />
-                    )}
-                    {pixError && <p className="text-red-500">Failed to fetch PIX data</p>}
-                </div>
-
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    {pixLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <LineChart color="#FFD700" title="Evolução de Despesas" data={expenseData} />
-                    )}
-                    {pixError && <p className="text-red-500">Failed to fetch PIX data</p>}
-                </div>
-
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <ColumnWithMarkers title="Metas de Gastos" />
-                </div>
-            </div>
-
+            {/* Gráficos de evolução no topo */}
             <div className="grid md:grid-cols-2 gap-4 mt-5">
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    {balanceLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        <>
-                            <Card title="Saldo Total" value={balance ? balance.saldo : 0} />
-                        </>
-                    )}
-                    {balanceError && <p className="text-red-500">Failed to fetch balance</p>}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <AreaStackedChart
+                        title="Evolução Receitas, Despesas, Investimentos e Saldo"
+                        series={getExtractAreaSeries(extractResume)}
+                        categories={extractMonths(extractResume)}
+                    />
                 </div>
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <AreaStackedChart title="Renda x Investimentos x Dívida Acumulada" />
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução do Saldo por Período"
+                        color="#007bff"
+                        data={extractToSeries(extractResume, 'saldo')}
+                    />
+                </div>
+            </div>
+            {/* Cards e listas de totais/maiores receitas/despesas abaixo */}
+            <div className="mt-5">
+                <div className="grid md:grid-cols-3 gap-4">
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        {extractLoading ? <LoadingSpinner /> : extractTotals && (
+                            <>
+                                <Card title="Total Receitas" value={extractTotals.total_receitas} />
+                                <Card title="Total Despesas" value={extractTotals.total_despesas} />
+                                <Card title="Total Investimentos" value={extractTotals.total_investimentos} />
+                                <Card title="Saldo Final" value={extractTotals.saldo_final} />
+                                <Card title="Média Receitas" value={extractTotals.media_receitas_por_periodo} />
+                                <Card title="Média Despesas" value={extractTotals.media_despesas_por_periodo} />
+                            </>
+                        )}
+                        {extractError && <p className="text-red-500">{extractError}</p>}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        <h3 className="font-bold mb-2 text-red-400">Maiores Despesas</h3>
+                        {extractLoading ? <LoadingSpinner /> : (
+                            <div>
+                                {maioresDespesas.slice(0, 5).map((d, i) => (
+                                    <Card
+                                        key={i}
+                                        title={`${d.data?.slice(0, 10)} - ${d.descricao}`}
+                                        value={<span className="text-red-400 font-bold">{d.valor}</span>}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        <h3 className="font-bold mb-2 text-green-400">Maiores Receitas</h3>
+                        {extractLoading ? <LoadingSpinner /> : (
+                            <div>
+                                {maioresReceitas.slice(0, 5).map((r, i) => (
+                                    <Card
+                                        key={i}
+                                        title={`${r.data?.slice(0, 10)} - ${r.descricao}`}
+                                        value={<span className="text-green-400 font-bold">{r.valor}</span>}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-4 mt-5">
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <Card title="Investimento em Renda Fixa" value={20} />
-                    <Card title="Investimento em Renda Variável" value={20} />
-                    <Card title="Investimento Total" value={20} />
-                </div>
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <ColumnWithDataLabelsChart title="Investimentos - Lucro Líquido" />
-                </div>
 
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <Card title="Reserva em Dólar" value={20} />
-                    <Card title="Reserva em Euro" value={20} />
-                    <Card title="Reserva em Bitcoin" value={20} />
+            <div className="mt-5">
+                <div className="grid md:grid-cols-3 gap-4">
+                    <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
+                        {investingLoading ? (
+                            <LoadingSpinner />
+                        ) : investingTotals ? (
+                            <>
+                                <Card title="Saldo Investido" value={investingTotals.total_saldo_investido} />
+                                <Card title="Total Recebíveis" value={investingTotals.total_recebiveis} />
+                                <Card title="Total CDB" value={investingTotals.total_cdb} />
+                            </>
+                        ) : investingError ? (
+                            <p className="text-red-500">{investingError}</p>
+                        ) : null}
+                    </div>
+                    <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
+                        {investingLoading ? (
+                            <LoadingSpinner />
+                        ) : investingTotals ? (
+                            <>
+                                <Card title="Total Crypto" value={investingTotals.total_crypto} />
+                                <Card title="Total Dólar" value={investingTotals.total_dolar} />
+                            </>
+                        ) : null}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        {pricesLoading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <>
+                                <Card title="Dólar/Real" value={prices ? prices.USDBRL : 0} />
+                                <Card title="Bitcoin/Real" value={prices ? prices.BTCBRL : 0} />
+                                <Card title="Dólar/Bitcoin" value={prices ? prices.USDBTC : 0} />
+                            </>
+                        )}
+                    </div>
                 </div>
+                
+            </div>
 
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white ">
-                    <Card title="Entradas (Mês)" value={7000.00} />
-                    <Card title="Saídas (Mês)" value={5366.88} />
-                    <Card title="Saldo em Conta (Mês)" value={7000.00 - 5366.88} />
-                </div>
-
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white ">
-                    <ColumnWithDataLabelsChart title="Dólar / Euro / Bitcoin - Lucro Líquido" />
+            {/* Habit Tracker - Notion */}
+            <div className="mt-5">
+                <div className="grid md:grid-cols-4 gap-4">
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                            <>
+                                <Card title="Total de Hábitos" value={notionResume.total_habits} />
+                                <Card title="Completos" value={notionResume.total_habits_completed} />
+                                <Card title="Não Completos" value={notionResume.total_habits_not_completed} />
+                                <Card title="Progresso (%)" value={notionResume.total_habits_progress_percentage?.toFixed(2) + '%'} />
+                            </>
+                        )}
+                        {notionError && <p className="text-red-500">{notionError}</p>}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                            <>
+                                <Card title="Jiu Jitsu" value={notionResume.total_jiu_jitsu_progress} />
+                                <Card title="Natação" value={notionResume.total_natacao_progress} />
+                                <Card title="Corrida" value={notionResume.total_corrida_progress} />
+                                <Card title="Boxe" value={notionResume.total_boxe_progress} />
+                            </>
+                        )}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                            <>
+                                <Card title="Musculação" value={notionResume.total_musculacao_progress} />
+                                <Card title="Música" value={notionResume.total_musica_progress} />
+                                <Card title="Creatina" value={notionResume.total_creatina_progress} />
+                            </>
+                        )}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 flex items-center justify-center">
+                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                            <BarChart
+                                title="Progresso por Hábito"
+                                categories={["Jiu Jitsu", "Natação", "Corrida", "Boxe", "Musculação", "Música", "Creatina"]}
+                                data={[
+                                    notionResume.total_jiu_jitsu_progress,
+                                    notionResume.total_natacao_progress,
+                                    notionResume.total_corrida_progress,
+                                    notionResume.total_boxe_progress,
+                                    notionResume.total_musculacao_progress,
+                                    notionResume.total_musica_progress,
+                                    notionResume.total_creatina_progress
+                                ]}
+                            />
+                        )}
+                    </div>
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 flex items-center justify-center">
+                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                            <HabitsDonutChart
+                                title="Distribuição dos Hábitos"
+                                categories={[
+                                    "Jiu Jitsu",
+                                    "Natação",
+                                    "Corrida",
+                                    "Boxe",
+                                    "Musculação",
+                                    "Música",
+                                    "Creatina"
+                                ]}
+                                data={[
+                                    notionResume.total_jiu_jitsu_progress ?? 0,
+                                    notionResume.total_natacao_progress ?? 0,
+                                    notionResume.total_corrida_progress ?? 0,
+                                    notionResume.total_boxe_progress ?? 0,
+                                    notionResume.total_musculacao_progress ?? 0,
+                                    notionResume.total_musica_progress ?? 0,
+                                    notionResume.total_creatina_progress ?? 0
+                                ]}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4 mt-5 ">
-                <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white h-96 overflow-y-auto">
-                    <Card title="Compra no débito" value={10000} />
-                    <Card title="Pix Enviado" value={35463} />
-                    <Card title="Compra no Crédito" value={124124} />
-                    <Card title="Boleto Pago" value={124124} />
-                    <Card title="Boleto Pago" value={124124} />
-                    <Card title="Compra no débito" value={124124} />
-                    <Card title="Compra no débito" value={124124} />
-                    <Card title="Compra no débito" value={124124} />
-                </div>
-                <div className="p-5 border h-96 dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                    <SimplePieChart title="Renda x Investimentos x Dívida Acumulada" />
-                </div>
-            </div>
         </div>
     );
 }

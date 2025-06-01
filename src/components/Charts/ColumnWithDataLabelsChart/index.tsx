@@ -3,17 +3,13 @@ import React from "react";
 import ReactApexChart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 
-interface myColumnWithDataLabelsChart {
+interface ColumnWithDataLabelsChartProps {
   title: string;
+  series: { name: string; data: number[] }[];
+  categories: string[];
 }
 
-export default function ColumnWithDataLabelsChart({title}: myColumnWithDataLabelsChart) {
-
-    const series = [{
-        name: 'Inflation',
-        data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2]
-      }]
-
+export default function ColumnWithDataLabelsChart({ title, series, categories }: ColumnWithDataLabelsChartProps) {
     const options: ApexOptions = {
         chart: {
           height: 350,
@@ -40,7 +36,7 @@ export default function ColumnWithDataLabelsChart({title}: myColumnWithDataLabel
         },
         
         xaxis: {
-          categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          categories: categories,
           position: 'top',
           labels: {
             style: {
