@@ -50,8 +50,6 @@ export default function HabitsDonutChart({ title, categories, data, height = 350
         useSeriesColors: false
       },
       markers: {
-        width: 12,
-        height: 12,
         strokeWidth: 0,
         strokeColor: '#fff',
         radius: 12,

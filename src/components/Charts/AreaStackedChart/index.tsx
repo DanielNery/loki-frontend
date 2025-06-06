@@ -83,8 +83,6 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
                 colors: '#D3D3D3'
             },
             markers: {
-                width: 12,
-                height: 12,
                 strokeWidth: 0,
                 strokeColor: '#fff',
                 radius: 12
