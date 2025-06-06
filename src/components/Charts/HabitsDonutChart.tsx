@@ -52,7 +52,6 @@ export default function HabitsDonutChart({ title, categories, data, height = 350
       // @ts-ignore
       markers: {
         strokeWidth: 0,
-        radius: 12,
         offsetX: 0,
         offsetY: 0
       },

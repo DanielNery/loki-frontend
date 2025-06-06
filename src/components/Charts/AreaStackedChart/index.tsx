@@ -84,7 +84,6 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             },
             markers: {
                 strokeWidth: 0,
-                radius: 12
             },
             itemMargin: {
                 horizontal: 10
