@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosHeaders } from 'axios';
 
-export const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000'
 });
 
 function getLoadingContext() {
@@ -9,19 +10,18 @@ function getLoadingContext() {
   return require('../hooks/useLoading');
 }
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  // Ativa loading global
-  try {
-    const { useLoading } = getLoadingContext();
-    const loading = useLoading();
-    loading.showLoading();
-  } catch {}
-  return config;
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Ativa loading global
+    try {
+      const { useLoading } = getLoadingContext();
+      const loading = useLoading();
+      loading.showLoading();
+    } catch {}
+    return config;
 });
 
 api.interceptors.response.use(
@@ -42,3 +42,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export { api };
