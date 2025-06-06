@@ -49,9 +49,9 @@ export default function HabitsDonutChart({ title, categories, data, height = 350
         colors: '#D3D3D3',
         useSeriesColors: false
       },
+      // @ts-ignore
       markers: {
         strokeWidth: 0,
-        strokeColor: '#fff',
         radius: 12,
         offsetX: 0,
         offsetY: 0

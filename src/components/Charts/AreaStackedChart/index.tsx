@@ -84,7 +84,6 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             },
             markers: {
                 strokeWidth: 0,
-                strokeColor: '#fff',
                 radius: 12
             },
             itemMargin: {
@@ -150,11 +149,11 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
                 fontSize: '12px'
             }
         },
+        // @ts-ignore
         markers: {
-            size: 0,
-            hover: {
-                size: 5
-            }
+            size: 12,
+            strokeWidth: 0,
+            shape: 'circle'
         }
     };
 
