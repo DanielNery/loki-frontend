@@ -6,6 +6,7 @@ import { useBalance } from "../../hooks/useBalance";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
+import InvestmentPositions from "../../components/InvestmentPositions";
 
 import LineChart from "../../components/Charts/LineChart";
 import ColumnWithDataLabelsChart from "../../components/Charts/ColumnWithDataLabelsChart";
@@ -75,6 +76,24 @@ function getTotalsForColumnChart(totals: any) {
     };
 }
 
+// Função para preparar dados para gráfico de receitas e despesas mensais
+function getReceitasDespesasBarData(resume: any) {
+    if (!resume) return { categories: [], receitas: [], despesas: [] };
+    const categories = Object.keys(resume);
+    const receitas = categories.map(mes => resume[mes].total_receitas || 0);
+    const despesas = categories.map(mes => resume[mes].total_despesas || 0);
+    return { categories, receitas, despesas };
+}
+
+// Função para preparar dados para gráfico de freelance e imposto mensal
+function getFreelanceImpostoBarData(resume: any) {
+    if (!resume) return { categories: [], freelance: [], imposto: [] };
+    const categories = Object.keys(resume);
+    const freelance = categories.map(mes => resume[mes].total_freelance || 0);
+    const imposto = categories.map(mes => resume[mes].imposto_aproximado || 0);
+    return { categories, freelance, imposto };
+}
+
 export default function Home() {
     const { prices, loading: pricesLoading, error: pricesError } = usePrices();
     const { balance, loading: balanceLoading, error: balanceError } = useBalance();
@@ -82,6 +101,7 @@ export default function Home() {
 
     const [investingTotals, setInvestingTotals] = useState<any>(null);
     const [investingResume, setInvestingResume] = useState<any>(null);
+    const [currentPositions, setCurrentPositions] = useState<any>(null);
     const [investingLoading, setInvestingLoading] = useState(false);
     const [investingError, setInvestingError] = useState('');
 
@@ -97,12 +117,16 @@ export default function Home() {
     const [notionLoading, setNotionLoading] = useState(false);
     const [notionError, setNotionError] = useState('');
 
+    const barData = getReceitasDespesasBarData(extractResume);
+    const freelanceImpostoBarData = getFreelanceImpostoBarData(extractResume);
+
     useEffect(() => {
         setInvestingLoading(true);
         api.get('/api/v1/investing/resume')
             .then(res => {
                 setInvestingTotals(res.data.totais);
                 setInvestingResume(res.data.resumo_mensal);
+                setCurrentPositions(res.data.posicao_atual?.ativos);
             })
             .catch((err) => {
                 if (err?.response?.status === 403) navigate('/login');
@@ -201,6 +225,8 @@ export default function Home() {
                                 <Card title="Total Receitas" value={extractTotals.total_receitas} />
                                 <Card title="Total Despesas" value={extractTotals.total_despesas} />
                                 <Card title="Total Investimentos" value={extractTotals.total_investimentos} />
+                                <Card title="Total Freelance" value={extractTotals.total_freelance} />
+                                <Card title="Imposto Aproximado" value={extractTotals.imposto_aproximado} />
                                 <Card title="Saldo Final" value={extractTotals.saldo_final} />
                                 <Card title="Média Receitas" value={extractTotals.media_receitas_por_periodo} />
                                 <Card title="Média Despesas" value={extractTotals.media_despesas_por_periodo} />
@@ -239,6 +265,49 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* Gráfico de colunas de receitas e despesas mensais */}
+            <div className="mt-5">
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Receitas Mensais"
+                        categories={barData.categories}
+                        data={barData.receitas}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full mt-4">
+                    <BarChart
+                        title="Despesas Mensais"
+                        categories={barData.categories}
+                        data={barData.despesas}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+            </div>
+
+            {/* Gráficos de colunas de freelance e imposto mensal */}
+            <div className="mt-5">
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Freelance Mensal"
+                        categories={freelanceImpostoBarData.categories}
+                        data={freelanceImpostoBarData.freelance}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full mt-4">
+                    <BarChart
+                        title="Imposto Aproximado Mensal"
+                        categories={freelanceImpostoBarData.categories}
+                        data={freelanceImpostoBarData.imposto}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+            </div>
 
             <div className="mt-5">
                 <div className="grid md:grid-cols-3 gap-4">
@@ -280,9 +349,20 @@ export default function Home() {
                 
             </div>
 
+            {/* Add the new InvestmentPositions component */}
+            <div className="mt-5">
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    {investingLoading ? (
+                        <LoadingSpinner />
+                    ) : currentPositions ? (
+                        <InvestmentPositions positions={currentPositions} />
+                    ) : null}
+                </div>
+            </div>
+
             {/* Habit Tracker - Notion */}
             <div className="mt-5">
-                <div className="grid md:grid-cols-4 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                     <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <>
@@ -313,7 +393,7 @@ export default function Home() {
                             </>
                         )}
                     </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 flex items-center justify-center">
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full col-span-2">
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <BarChart
                                 title="Progresso por Hábito"
@@ -324,13 +404,13 @@ export default function Home() {
                                     notionResume.total_corrida_progress,
                                     notionResume.total_boxe_progress,
                                     notionResume.total_musculacao_progress,
-                                    notionResume.total_musica_progress,
-                                    notionResume.total_creatina_progress
                                 ]}
+                                height={500}
+                                width="100%"
                             />
                         )}
                     </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 flex items-center justify-center">
+                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full col-span-2">
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <HabitsDonutChart
                                 title="Distribuição dos Hábitos"
@@ -349,9 +429,9 @@ export default function Home() {
                                     notionResume.total_corrida_progress ?? 0,
                                     notionResume.total_boxe_progress ?? 0,
                                     notionResume.total_musculacao_progress ?? 0,
-                                    notionResume.total_musica_progress ?? 0,
-                                    notionResume.total_creatina_progress ?? 0
                                 ]}
+                                height={500}
+                                width="100%"
                             />
                         )}
                     </div>

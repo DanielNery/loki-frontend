@@ -8,9 +8,9 @@ interface LineChartProps {
   data: { date: string; value: number }[];
 }
 
-export default function LineChart({ color, title, data }: LineChartProps) {
+export default function LineChart({ color = '#007bff', title, data }: LineChartProps) {
   const series = [{
-    name: 'Série 1',
+    name: 'Valor',
     data: data.map(item => item.value)
   }];
 
@@ -18,41 +18,138 @@ export default function LineChart({ color, title, data }: LineChartProps) {
     chart: {
       type: 'line',
       height: 350,
+      toolbar: {
+        show: false
+      },
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 800,
+        animateGradually: {
+          enabled: true,
+          delay: 150
+        },
+        dynamicAnimation: {
+          enabled: true,
+          speed: 350
+        }
+      }
     },
     title: {
       text: title,
       floating: true,
-      offsetY: 50,
+      offsetY: 20,
       align: 'center',
       style: {
-        color: '#D3D3D3'
+        color: '#D3D3D3',
+        fontSize: '16px',
+        fontWeight: 500
+      }
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 3,
+      lineCap: 'round'
+    },
+    colors: [color],
+    dataLabels: {
+      enabled: false
+    },
+    markers: {
+      size: 0,
+      hover: {
+        size: 5,
+        sizeOffset: 3
       }
     },
     xaxis: {
       categories: data.map(item => item.date),
       labels: {
         style: {
-          colors: '#D3D3D3', // Define a cor do texto do eixo X para branco
-        }
+          colors: '#D3D3D3',
+          fontSize: '12px'
+        },
+        rotate: -45,
+        rotateAlways: false
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
       }
     },
     yaxis: {
       labels: {
         style: {
-          colors: '#D3D3D3', // Define a cor do texto do eixo Y para branco
+          colors: '#D3D3D3',
+          fontSize: '12px'
+        },
+        formatter: (value) => {
+          return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
+      },
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
       }
     },
     grid: {
-      show: false // Oculta as grades do gráfico
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      strokeDashArray: 4,
+      xaxis: {
+        lines: {
+          show: true
+        }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      }
     },
-    colors: [color]
-    // Outras opções de configuração podem ser adicionadas aqui
+    tooltip: {
+      y: {
+        formatter: (value) => {
+          return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+      },
+      theme: 'dark',
+      style: {
+        fontSize: '12px'
+      },
+      x: {
+        show: true,
+        formatter: (value, { dataPointIndex }) => {
+          return data[dataPointIndex].date;
+        }
+      }
+    },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shade: 'dark',
+        type: 'vertical',
+        shadeIntensity: 0.5,
+        gradientToColors: [color],
+        inverseColors: false,
+        opacityFrom: 0.8,
+        opacityTo: 0.2,
+        stops: [0, 90, 100]
+      }
+    }
   };
 
   return (
     <div id="chart">
-      <ReactApexChart options={options} series={series} type="line" height={350} />
+      <ReactApexChart 
+        options={options} 
+        series={series} 
+        type="line" 
+        height={350} 
+      />
     </div>
   );
 }
