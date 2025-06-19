@@ -378,9 +378,10 @@ export default function Home() {
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <>
                                 <Card title="Jiu Jitsu" value={notionResume.total_jiu_jitsu_progress} />
+                                <Card title="Muay Thai" value={notionResume.total_muay_thai_progress} />
+                                <Card title="Boxe" value={notionResume.total_boxe_progress} />
                                 <Card title="Natação" value={notionResume.total_natacao_progress} />
                                 <Card title="Corrida" value={notionResume.total_corrida_progress} />
-                                <Card title="Boxe" value={notionResume.total_boxe_progress} />
                             </>
                         )}
                     </div>
@@ -397,9 +398,10 @@ export default function Home() {
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <BarChart
                                 title="Progresso por Hábito"
-                                categories={["Jiu Jitsu", "Natação", "Corrida", "Boxe", "Musculação", "Música", "Creatina"]}
+                                categories={["Jiu Jitsu", "Muay Thai", "Natação", "Corrida", "Boxe", "Musculação"]}
                                 data={[
                                     notionResume.total_jiu_jitsu_progress,
+                                    notionResume.total_muay_thai_progress,
                                     notionResume.total_natacao_progress,
                                     notionResume.total_corrida_progress,
                                     notionResume.total_boxe_progress,
@@ -413,22 +415,22 @@ export default function Home() {
                     <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full col-span-2">
                         {notionLoading ? <LoadingSpinner /> : notionResume && (
                             <HabitsDonutChart
-                                title="Distribuição dos Hábitos"
+                                title=""
                                 categories={[
                                     "Jiu Jitsu",
-                                    "Natação",
-                                    "Corrida",
+                                    "Muay Thai",
                                     "Boxe",
                                     "Musculação",
-                                    "Música",
-                                    "Creatina"
+                                    "Natação",
+                                    "Corrida",
                                 ]}
                                 data={[
                                     notionResume.total_jiu_jitsu_progress ?? 0,
-                                    notionResume.total_natacao_progress ?? 0,
-                                    notionResume.total_corrida_progress ?? 0,
+                                    notionResume.total_muay_thai_progress ?? 0,
                                     notionResume.total_boxe_progress ?? 0,
                                     notionResume.total_musculacao_progress ?? 0,
+                                    notionResume.total_natacao_progress ?? 0,
+                                    notionResume.total_corrida_progress ?? 0,
                                 ]}
                                 height={500}
                                 width="100%"
