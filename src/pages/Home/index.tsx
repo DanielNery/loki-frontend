@@ -15,6 +15,7 @@ import AreaStackedChart from "../../components/Charts/AreaStackedChart";
 import SimplePieChart from "../../components/Charts/SimplePieChart";
 import BarChart from "../../components/Charts/BarChart";
 import HabitsDonutChart from "../../components/Charts/HabitsDonutChart";
+import { FaRegCalendarCheck } from 'react-icons/fa';
 
 import './styles.css';
 
@@ -117,6 +118,10 @@ export default function Home() {
     const [notionLoading, setNotionLoading] = useState(false);
     const [notionError, setNotionError] = useState('');
 
+    const [fixedExpenses, setFixedExpenses] = useState<any[]>([]);
+    const [fixedExpensesLoading, setFixedExpensesLoading] = useState(false);
+    const [fixedExpensesError, setFixedExpensesError] = useState('');
+
     const barData = getReceitasDespesasBarData(extractResume);
     const freelanceImpostoBarData = getFreelanceImpostoBarData(extractResume);
 
@@ -162,6 +167,14 @@ export default function Home() {
             .finally(() => setNotionLoading(false));
     }, [navigate]);
 
+    useEffect(() => {
+        setFixedExpensesLoading(true);
+        api.get('/api/v1/extract/fixed-expenses')
+            .then(res => setFixedExpenses(res.data))
+            .catch(() => setFixedExpensesError('Erro ao buscar despesas fixas.'))
+            .finally(() => setFixedExpensesLoading(false));
+    }, []);
+
     function extractToSeries(resume: any, key: string) {
         if (!resume) return [];
         return Object.entries(resume).map(([date, obj]: [string, any]) => ({
@@ -199,8 +212,65 @@ export default function Home() {
     return (
         <div>
             <Header />
-            {/* Gráficos de evolução no topo */}
+            {/* Grid dinâmica de gráficos no topo, mantendo todos os gráficos já existentes */}
             <div className="grid md:grid-cols-2 gap-4 mt-5">
+                {/* Gráfico de rosca de ativos */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    {currentPositions && Object.keys(currentPositions).length > 0 && (() => {
+                        const ativos = Object.entries(currentPositions)
+                            .map(([k, v]) => [k, parseFloat(String(v).replace(/[^0-9\,\.\-]/g, '').replace(',', '.'))] as [string, number])
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 10);
+                        const labels = ativos.map(([k]) => k);
+                        const series = ativos.map(([, v]) => v);
+                        return (
+                            <SimplePieChart
+                                title="Participação dos Ativos"
+                                labels={labels}
+                                series={series}
+                                height={500}
+                                width={"100%"}
+                                valueFormatter={val => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 })}
+                            />
+                        );
+                    })()}
+                </div>
+                {/* Gráfico de linha de receitas */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução das Receitas"
+                        color="#15c16b"
+                        data={extractToSeries(extractResume, 'total_receitas')}
+                    />
+                </div>
+                {/* Gráfico de barras de hábitos */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    {notionLoading ? <LoadingSpinner /> : notionResume && (
+                        <BarChart
+                            title="Progresso por Hábito"
+                            categories={["Jiu Jitsu", "Muay Thai", "Natação", "Corrida", "Boxe", "Musculação"]}
+                            data={[
+                                notionResume.total_jiu_jitsu_progress,
+                                notionResume.total_muay_thai_progress,
+                                notionResume.total_natacao_progress,
+                                notionResume.total_corrida_progress,
+                                notionResume.total_boxe_progress,
+                                notionResume.total_musculacao_progress,
+                            ]}
+                            height={500}
+                            width="100%"
+                        />
+                    )}
+                </div>
+                {/* Gráfico de linha de despesas */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução das Despesas"
+                        color="#FF4560"
+                        data={extractToSeries(extractResume, 'total_despesas')}
+                    />
+                </div>
+                {/* Gráfico de área de evolução geral */}
                 <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
                     <AreaStackedChart
                         title="Evolução Receitas, Despesas, Investimentos e Saldo"
@@ -208,11 +278,101 @@ export default function Home() {
                         categories={extractMonths(extractResume)}
                     />
                 </div>
+                {/* Gráfico de linha de saldo */}
                 <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
                     <LineChart
                         title="Evolução do Saldo por Período"
                         color="#007bff"
                         data={extractToSeries(extractResume, 'saldo')}
+                    />
+                </div>
+                {/* Gráfico de linha de investimentos */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução dos Investimentos"
+                        color="#008FFB"
+                        data={extractToSeries(extractResume, 'total_investimentos')}
+                    />
+                </div>
+                {/* Gráfico de rosca de hábitos */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    {notionLoading ? <LoadingSpinner /> : notionResume && (
+                        <HabitsDonutChart
+                            title=""
+                            categories={[
+                                "Jiu Jitsu",
+                                "Muay Thai",
+                                "Boxe",
+                                "Musculação",
+                                "Natação",
+                                "Corrida",
+                            ]}
+                            data={[
+                                notionResume.total_jiu_jitsu_progress ?? 0,
+                                notionResume.total_muay_thai_progress ?? 0,
+                                notionResume.total_boxe_progress ?? 0,
+                                notionResume.total_musculacao_progress ?? 0,
+                                notionResume.total_natacao_progress ?? 0,
+                                notionResume.total_corrida_progress ?? 0,
+                            ]}
+                            height={500}
+                            width="100%"
+                        />
+                    )}
+                </div>
+                {/* Gráfico de linha de freelance */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução do Freelance"
+                        color="#FEB019"
+                        data={extractToSeries(extractResume, 'total_freelance')}
+                    />
+                </div>
+                {/* Gráfico de linha de imposto */}
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <LineChart
+                        title="Evolução do Imposto Aproximado"
+                        color="#775DD0"
+                        data={extractToSeries(extractResume, 'imposto_aproximado')}
+                    />
+                </div>
+            </div>
+            {/* Gráficos de colunas em grid de duas colunas */}
+            <div className="mt-5 grid md:grid-cols-2 gap-4">
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Receitas Mensais"
+                        categories={barData.categories}
+                        data={barData.receitas}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Despesas Mensais"
+                        categories={barData.categories}
+                        data={barData.despesas}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Freelance Mensal"
+                        categories={freelanceImpostoBarData.categories}
+                        data={freelanceImpostoBarData.freelance}
+                        height={400}
+                        width="100%"
+                    />
+                </div>
+                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <BarChart
+                        title="Imposto Aproximado Mensal"
+                        categories={freelanceImpostoBarData.categories}
+                        data={freelanceImpostoBarData.imposto}
+                        height={400}
+                        width="100%"
                     />
                 </div>
             </div>
@@ -262,91 +422,28 @@ export default function Home() {
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
-
-            {/* Gráfico de colunas de receitas e despesas mensais */}
-            <div className="mt-5">
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
-                    <BarChart
-                        title="Receitas Mensais"
-                        categories={barData.categories}
-                        data={barData.receitas}
-                        height={400}
-                        width="100%"
-                    />
-                </div>
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full mt-4">
-                    <BarChart
-                        title="Despesas Mensais"
-                        categories={barData.categories}
-                        data={barData.despesas}
-                        height={400}
-                        width="100%"
-                    />
-                </div>
-            </div>
-
-            {/* Gráficos de colunas de freelance e imposto mensal */}
-            <div className="mt-5">
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
-                    <BarChart
-                        title="Freelance Mensal"
-                        categories={freelanceImpostoBarData.categories}
-                        data={freelanceImpostoBarData.freelance}
-                        height={400}
-                        width="100%"
-                    />
-                </div>
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full mt-4">
-                    <BarChart
-                        title="Imposto Aproximado Mensal"
-                        categories={freelanceImpostoBarData.categories}
-                        data={freelanceImpostoBarData.imposto}
-                        height={400}
-                        width="100%"
-                    />
-                </div>
-            </div>
-
-            <div className="mt-5">
-                <div className="grid md:grid-cols-3 gap-4">
-                    <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                        {investingLoading ? (
-                            <LoadingSpinner />
-                        ) : investingTotals ? (
-                            <>
-                                <Card title="Saldo Investido" value={investingTotals.total_saldo_investido} />
-                                <Card title="Total Recebíveis" value={investingTotals.total_recebiveis} />
-                                <Card title="Total CDB" value={investingTotals.total_cdb} />
-                            </>
-                        ) : investingError ? (
-                            <p className="text-red-500">{investingError}</p>
-                        ) : null}
-                    </div>
-                    <div className="p-5 border dark:border-black hover:border-green-600 dark:hover:border-green-600 rounded-lg dark:bg-slate-950 dark:bg-opacity-50 bg-white">
-                        {investingLoading ? (
-                            <LoadingSpinner />
-                        ) : investingTotals ? (
-                            <>
-                                <Card title="Total Crypto" value={investingTotals.total_crypto} />
-                                <Card title="Total Dólar" value={investingTotals.total_dolar} />
-                            </>
-                        ) : null}
-                    </div>
                     <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        {pricesLoading ? (
-                            <LoadingSpinner />
+                        <h3 className="font-bold mb-4 text-blue-400 flex items-center gap-2 text-lg">
+                            <FaRegCalendarCheck className="text-blue-400" /> Despesas Fixas
+                        </h3>
+                        {fixedExpensesLoading ? <LoadingSpinner /> : fixedExpensesError ? (
+                            <p className="text-red-500">{fixedExpensesError}</p>
+                        ) : fixedExpenses.length === 0 ? (
+                            <p>Nenhuma despesa fixa encontrada.</p>
                         ) : (
-                            <>
-                                <Card title="Dólar/Real" value={prices ? prices.USDBRL : 0} />
-                                <Card title="Bitcoin/Real" value={prices ? prices.BTCBRL : 0} />
-                                <Card title="Dólar/Bitcoin" value={prices ? prices.USDBTC : 0} />
-                            </>
+                            <ul className="divide-y divide-slate-800">
+                                {fixedExpenses.slice(0, 8).map((item, idx) => (
+                                    <li key={idx} className="py-3 flex flex-col gap-1">
+                                        <span className="font-bold text-base text-slate-200">{item.descricao}</span>
+                                        <span className="text-xs text-slate-400">Banco: <span className="font-semibold text-slate-300">{item.banco}</span></span>
+                                        <span className="text-xs text-slate-400">Meses: <span className="font-semibold text-slate-300">{item.meses_distintos}</span> | Ocorrências: <span className="font-semibold text-slate-300">{item.ocorrencias}</span></span>
+                                        <span className="text-lg font-bold text-red-400 mt-1">{Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </div>
                 </div>
-                
             </div>
 
             {/* Add the new InvestmentPositions component */}
@@ -392,49 +489,6 @@ export default function Home() {
                                 <Card title="Música" value={notionResume.total_musica_progress} />
                                 <Card title="Creatina" value={notionResume.total_creatina_progress} />
                             </>
-                        )}
-                    </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full col-span-2">
-                        {notionLoading ? <LoadingSpinner /> : notionResume && (
-                            <BarChart
-                                title="Progresso por Hábito"
-                                categories={["Jiu Jitsu", "Muay Thai", "Natação", "Corrida", "Boxe", "Musculação"]}
-                                data={[
-                                    notionResume.total_jiu_jitsu_progress,
-                                    notionResume.total_muay_thai_progress,
-                                    notionResume.total_natacao_progress,
-                                    notionResume.total_corrida_progress,
-                                    notionResume.total_boxe_progress,
-                                    notionResume.total_musculacao_progress,
-                                ]}
-                                height={500}
-                                width="100%"
-                            />
-                        )}
-                    </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full col-span-2">
-                        {notionLoading ? <LoadingSpinner /> : notionResume && (
-                            <HabitsDonutChart
-                                title=""
-                                categories={[
-                                    "Jiu Jitsu",
-                                    "Muay Thai",
-                                    "Boxe",
-                                    "Musculação",
-                                    "Natação",
-                                    "Corrida",
-                                ]}
-                                data={[
-                                    notionResume.total_jiu_jitsu_progress ?? 0,
-                                    notionResume.total_muay_thai_progress ?? 0,
-                                    notionResume.total_boxe_progress ?? 0,
-                                    notionResume.total_musculacao_progress ?? 0,
-                                    notionResume.total_natacao_progress ?? 0,
-                                    notionResume.total_corrida_progress ?? 0,
-                                ]}
-                                height={500}
-                                width="100%"
-                            />
                         )}
                     </div>
                 </div>
