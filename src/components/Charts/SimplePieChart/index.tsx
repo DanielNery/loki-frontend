@@ -57,10 +57,7 @@ export default function SimplePieChart({title, labels, series, height = 350, wid
           markers: {
             strokeWidth: 0,
             offsetX: 0,
-            offsetY: 0,
-            width: 12,
-            height: 12,
-            radius: 6
+            offsetY: 0
           },
           itemMargin: {
             horizontal: 16,
