@@ -25,6 +25,9 @@ interface AreaStackedChartProps {
 }
 
 export default function AreaStackedChart({ title, series, categories }: AreaStackedChartProps) {
+    // Detecta se está no modo escuro
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    
     const options: ApexOptions = {
         chart: {
             type: 'area',
@@ -33,6 +36,9 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             toolbar: {
                 show: false
             },
+            background: 'transparent',
+            fontFamily: 'Inter, system-ui, sans-serif',
+            width: '100%',
             animations: {
                 enabled: true,
                 easing: 'easeinout',
@@ -53,12 +59,12 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             offsetY: 20,
             align: 'center',
             style: {
-                color: '#D3D3D3',
+                color: isDarkMode ? '#f1f5f9' : '#1e293b',
                 fontSize: '16px',
-                fontWeight: 500
+                fontWeight: 600
             }
         },
-        colors: ['#15c16b', '#00E396', '#FFD700', '#008FFB'],
+        colors: ['#10b981', '#06b6d4', '#f59e0b', '#3b82f6'],
         dataLabels: {
             enabled: false
         },
@@ -76,28 +82,36 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             }
         },
         legend: {
-            position: 'top',
-            horizontalAlign: 'left',
-            offsetY: -10,
+            position: 'bottom',
+            horizontalAlign: 'center',
+            offsetY: 10,
             labels: {
-                colors: '#D3D3D3'
+                colors: isDarkMode ? '#94a3b8' : '#64748b'
             },
             markers: {
                 strokeWidth: 0,
+                width: 8,
+                height: 8,
+                radius: 4
             },
             itemMargin: {
-                horizontal: 10
-            }
+                horizontal: 8,
+                vertical: 4
+            },
+            fontSize: '11px',
+            fontWeight: 500
         },
         xaxis: {
             categories: categories,
             labels: {
                 style: {
-                    colors: '#D3D3D3',
-                    fontSize: '12px'
+                    colors: isDarkMode ? '#94a3b8' : '#64748b',
+                    fontSize: '11px'
                 },
                 rotate: -45,
-                rotateAlways: false
+                rotateAlways: false,
+                maxHeight: 60,
+                trim: true
             },
             axisBorder: {
                 show: false
@@ -109,7 +123,7 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
         yaxis: {
             labels: {
                 style: {
-                    colors: '#D3D3D3',
+                    colors: isDarkMode ? '#94a3b8' : '#64748b',
                     fontSize: '12px'
                 },
                 formatter: (value) => {
@@ -124,8 +138,8 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             }
         },
         grid: {
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            strokeDashArray: 4,
+            borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+            strokeDashArray: 3,
             xaxis: {
                 lines: {
                     show: true
@@ -143,26 +157,55 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
                     return `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 }
             },
-            theme: 'dark',
+            theme: isDarkMode ? 'dark' : 'light',
             style: {
-                fontSize: '12px'
+                fontSize: '12px',
+                fontFamily: 'Inter, system-ui, sans-serif'
             }
         },
         // @ts-ignore
         markers: {
-            size: 12,
-            strokeWidth: 0,
-            shape: 'circle'
-        }
+            size: 6,
+            strokeWidth: 2,
+            strokeColors: ['#fff'],
+            shape: 'circle',
+            hover: {
+                size: 8
+            }
+        },
+        responsive: [{
+            breakpoint: 768,
+            options: {
+                chart: {
+                    height: 300
+                },
+                legend: {
+                    fontSize: '10px',
+                    offsetY: 5,
+                    itemMargin: {
+                        horizontal: 6,
+                        vertical: 3
+                    }
+                },
+                xaxis: {
+                    labels: {
+                        style: {
+                            fontSize: '10px'
+                        }
+                    }
+                }
+            }
+        }]
     };
 
     return (
-        <div id="chart">
+        <div id="chart" className="w-full overflow-hidden">
             <ReactApexChart 
                 options={options} 
                 series={series} 
                 type="area" 
-                height={350} 
+                height={350}
+                width="100%"
             />
         </div>
     );

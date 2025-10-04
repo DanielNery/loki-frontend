@@ -25,7 +25,7 @@ export default function GridRowEntry({ id, title, value, type }: myGridPropsInte
                     <span>{title}</span>
                     <span>{value}</span>
                     {
-                        type == "income" ? <span><FontAwesomeIcon icon={faArrowUpWideShort} /></span> : <span><FontAwesomeIcon icon={faArrowDownWideShort} className="text-red-600" /></span>
+                        type == "income" ? <span><FontAwesomeIcon icon={faArrowUpWideShort} /></span> : <span><FontAwesomeIcon icon={faArrowDownWideShort} className="text-accent-600 dark:text-accent-400" /></span>
                     }
                     <div className="flex flex-row justify-end">
                         <FontAwesomeIcon icon={faTrash} />

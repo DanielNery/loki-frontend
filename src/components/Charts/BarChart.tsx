@@ -11,9 +11,12 @@ interface BarChartProps {
 }
 
 export default function BarChart({ title, categories, data, height = 350, width = '100%' }: BarChartProps) {
+  // Detecta se está no modo escuro
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  
   const series = [
     {
-      name: 'Progresso',
+      name: 'Valor',
       data: data,
     },
   ];
@@ -25,6 +28,8 @@ export default function BarChart({ title, categories, data, height = 350, width 
       toolbar: {
         show: false
       },
+      background: 'transparent',
+      fontFamily: 'Inter, system-ui, sans-serif',
       animations: {
         enabled: true,
         easing: 'easeinout',
@@ -42,8 +47,8 @@ export default function BarChart({ title, categories, data, height = 350, width 
     plotOptions: {
       bar: {
         borderRadius: 8,
-        columnWidth: '60%',
-        distributed: true,
+        columnWidth: '70%',
+        distributed: false,
         dataLabels: {
           position: 'top'
         }
@@ -51,21 +56,20 @@ export default function BarChart({ title, categories, data, height = 350, width 
     },
     title: {
       text: title,
-      floating: true,
-      offsetY: 20,
-      align: 'center',
+      align: 'left',
       style: {
-        color: '#D3D3D3',
-        fontSize: '16px',
-        fontWeight: 500
+        color: isDarkMode ? '#f1f5f9' : '#1e293b',
+        fontSize: '18px',
+        fontWeight: '600'
       }
     },
     xaxis: {
       categories: categories,
       labels: {
         style: {
-          colors: '#D3D3D3',
-          fontSize: '12px'
+          colors: isDarkMode ? '#94a3b8' : '#64748b',
+          fontSize: '12px',
+          fontWeight: '500'
         },
         rotate: -45,
         rotateAlways: false
@@ -80,11 +84,17 @@ export default function BarChart({ title, categories, data, height = 350, width 
     yaxis: {
       labels: {
         style: {
-          colors: '#D3D3D3',
-          fontSize: '12px'
+          colors: isDarkMode ? '#94a3b8' : '#64748b',
+          fontSize: '12px',
+          fontWeight: '500'
         },
         formatter: (value) => {
-          return `${value}`;
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(value);
         }
       },
       axisBorder: {
@@ -95,8 +105,8 @@ export default function BarChart({ title, categories, data, height = 350, width 
       }
     },
     grid: {
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      strokeDashArray: 4,
+      borderColor: isDarkMode ? '#334155' : '#e2e8f0',
+      strokeDashArray: 3,
       xaxis: {
         lines: {
           show: true
@@ -108,51 +118,55 @@ export default function BarChart({ title, categories, data, height = 350, width 
         }
       }
     },
-    colors: [
-      '#15c16b', // Verde
-      '#00E396', // Verde claro
-      '#FFD700', // Amarelo
-      '#008FFB', // Azul
-      '#FEB019', // Laranja
-      '#FF4560', // Vermelho
-      '#775DD0'  // Roxo
-    ],
+    colors: ['#22c55e'],
     dataLabels: {
       enabled: true,
-      formatter: (val) => {
-        return `${val}`;
+      formatter: (val: number) => {
+        return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(val);
       },
       style: {
-        colors: ['#D3D3D3'],
-        fontSize: '12px',
-        fontWeight: 500
+        colors: [isDarkMode ? '#94a3b8' : '#64748b'],
+        fontSize: '11px',
+        fontWeight: '600'
       },
       offsetY: -20
     },
     tooltip: {
-      theme: 'dark',
+      theme: isDarkMode ? 'dark' : 'light',
       style: {
-        fontSize: '12px'
+        fontSize: '14px',
+        fontFamily: 'Inter, system-ui, sans-serif'
       },
       y: {
         formatter: (value) => {
-          return `${value}`;
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          }).format(value);
         }
       }
     },
     states: {
       hover: {
         filter: {
-          type: 'darken',
-          value: 0.8
+          type: 'lighten',
+          value: 0.1
         }
       },
       active: {
         filter: {
-          type: 'darken',
-          value: 0.8
+          type: 'lighten',
+          value: 0.1
         }
       }
+    },
+    legend: {
+      show: false
     }
   };
 

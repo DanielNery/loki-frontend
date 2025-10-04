@@ -82,17 +82,17 @@ export default function Entry() {
         <div className="flex justify-center items-center h-screen">
             <div className="w-full max-w-md">
                 {isNewEntry ? (
-                    <h1 className="text-3xl mb-4">Criar Lancamento</h1>
+                    <h1 className="text-3xl mb-4 text-slate-900 dark:text-slate-100">Criar Lancamento</h1>
                 ) : (
-                    <h1 className="text-3xl mb-4">Editar Lancamento</h1>
+                    <h1 className="text-3xl mb-4 text-slate-900 dark:text-slate-100">Editar Lancamento</h1>
                 )}
-                <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 shadow-md rounded px-8 pt-6 pb-8 mb-4">
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_name">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_name">
                             Nome
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_name"
                             type="text"
                             name="nm_name"
@@ -102,11 +102,11 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_bank">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_bank">
                             Banco
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_bank"
                             type="text"
                             name="nm_bank"
@@ -116,11 +116,11 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_value">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_value">
                             Valor
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_value"
                             type="number"
                             name="nm_value"
@@ -130,11 +130,11 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_description">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_description">
                             Descricao
                         </label>
                         <textarea
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_description"
                             name="nm_description"
                             value={formData.nm_description}
@@ -143,11 +143,11 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_date">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_date">
                             Data
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_date"
                             type="date"
                             name="nm_date"
@@ -156,11 +156,11 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nm_type">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="nm_type">
                             Tipo
                         </label>
                         <input
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 leading-tight focus:outline-none focus:shadow-outline focus:ring-2 focus:ring-primary-500/50"
                             id="nm_type"
                             type="text"
                             name="nm_type"
@@ -170,7 +170,7 @@ export default function Entry() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="is_active">
+                        <label className="block text-slate-700 dark:text-slate-300 text-sm font-bold mb-2" htmlFor="is_active">
                             Ativo
                         </label>
                         <input

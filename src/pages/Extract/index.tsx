@@ -64,24 +64,24 @@ export default function Extract() {
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <Header />
-      <div className="p-8">
-        <h2 className="text-2xl font-bold mb-4">Extrato</h2>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">Extrato</h2>
         <form onSubmit={handleUpload} className="mb-6 flex flex-col md:flex-row items-center gap-4">
           <input type="file" multiple onChange={handleFileChange} className="border p-2 rounded" />
           <button type="submit" disabled={uploading} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
             {uploading ? 'Enviando...' : 'Enviar Extrato'}
           </button>
         </form>
-        {uploadError && <p className="text-red-500 mb-2">{uploadError}</p>}
-        {uploadSuccess && <p className="text-green-500 mb-2">{uploadSuccess}</p>}
+        {uploadError && <p className="text-accent-600 dark:text-accent-400 mb-2">{uploadError}</p>}
+        {uploadSuccess && <p className="text-success-600 dark:text-success-400 mb-2">{uploadSuccess}</p>}
         <div className="mt-8">
-          <h3 className="text-xl font-semibold mb-2">Registros</h3>
+          <h3 className="text-xl font-semibold mb-2 text-slate-900 dark:text-slate-100">Registros</h3>
           {loading ? (
             <p>Carregando...</p>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-accent-600 dark:text-accent-400">{error}</p>
           ) : records.length === 0 ? (
             <p>Nenhum registro encontrado.</p>
           ) : (
@@ -101,7 +101,7 @@ export default function Extract() {
                     <tr key={rec._id} className="border-t">
                       <td className="px-4 py-2">{rec.data?.slice(0, 10)}</td>
                       <td className="px-4 py-2">{rec.descricao}</td>
-                      <td className={`px-4 py-2 font-bold ${rec.valor < 0 ? 'text-red-500' : 'text-green-600'}`}>{rec.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                      <td className={`px-4 py-2 font-bold ${rec.valor < 0 ? 'text-accent-600 dark:text-accent-400' : 'text-success-600 dark:text-success-400'}`}>{rec.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                       <td className="px-4 py-2">{rec.banco}</td>
                       <td className="px-4 py-2">{rec.categoria || '-'}</td>
                     </tr>
@@ -112,6 +112,6 @@ export default function Extract() {
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 } 

@@ -13,6 +13,8 @@ interface mySimplePieChartProps {
 }
 
 export default function SimplePieChart({title, labels, series, height = 350, width = '100%', valueFormatter}: mySimplePieChartProps){
+    // Detecta se está no modo escuro
+    const isDarkMode = document.documentElement.classList.contains('dark');
     const formatValue = valueFormatter || ((val: number) => val.toString());
     const options: ApexOptions = {
         chart: {
@@ -38,86 +40,70 @@ export default function SimplePieChart({title, labels, series, height = 350, wid
           offsetY: 20,
           align: 'center',
           style: {
-            color: '#D3D3D3',
-            fontSize: '15px',
-            fontWeight: 500
+            color: isDarkMode ? '#f1f5f9' : '#1e293b',
+            fontSize: '16px',
+            fontWeight: 600
           }
         },
         legend: {
           position: 'bottom',
           horizontalAlign: 'center',
-          offsetY: 0,
-          height: 100,
+          offsetY: 20,
+          height: 140,
           labels: {
-            colors: '#D3D3D3',
+            colors: isDarkMode ? '#94a3b8' : '#64748b',
             useSeriesColors: false
           },
           markers: {
             strokeWidth: 0,
             offsetX: 0,
-            offsetY: 0
+            offsetY: 0,
+            width: 12,
+            height: 12,
+            radius: 6
           },
           itemMargin: {
-            horizontal: 10,
-            vertical: 5
-          }
+            horizontal: 16,
+            vertical: 10
+          },
+          fontSize: '13px',
+          fontWeight: 500
         },
         dataLabels: {
-          enabled: true,
-          // @ts-ignore
-          formatter: function(val: string, opts: any) {
-            if (opts && opts.w && opts.w.config && typeof opts.seriesIndex !== 'undefined' && opts.w.config.series) {
-              return formatValue(opts.w.config.series[opts.seriesIndex]);
-            }
-            if (typeof val === 'number') return formatValue(val);
-            return '';
-          },
-          style: {
-            colors: ['#fff'],
-            fontSize: '12px',
-            fontWeight: 500,
-            fontFamily: 'Inter, sans-serif'
-          },
-          dropShadow: {
-            enabled: true,
-            opacity: 0.3,
-            blur: 3,
-            left: -2,
-            top: 2
-          },
-          background: {
-            enabled: false
-          }
+          enabled: false
         },
         colors: [
-          '#15c16b', // Verde
-          '#00E396', // Verde claro
-          '#FFD700', // Amarelo
-          '#008FFB', // Azul
-          '#FEB019', // Laranja
-          '#FF4560', // Vermelho
-          '#775DD0'  // Roxo
+          '#10b981', // Verde esmeralda
+          '#06b6d4', // Ciano
+          '#f59e0b', // Âmbar
+          '#3b82f6', // Azul
+          '#ef4444', // Vermelho
+          '#8b5cf6', // Roxo
+          '#f97316', // Laranja
+          '#84cc16', // Lima
+          '#ec4899', // Rosa
+          '#6366f1'  // Índigo
         ],
         plotOptions: {
           pie: {
             donut: {
-              size: '65%',
+              size: '75%',
               background: 'transparent',
               labels: {
                 show: true,
                 name: {
                   show: true,
-                  fontSize: '12px',
+                  fontSize: '14px',
                   fontWeight: 600,
-                  color: '#D3D3D3',
-                  offsetY: -8
+                  color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                  offsetY: -15
                 },
                 value: {
                   show: true,
-                  fontSize: '18px',
+                  fontSize: '20px',
                   fontWeight: 700,
-                  color: '#D3D3D3',
-                  offsetY: 2,
+                  color: isDarkMode ? '#f1f5f9' : '#1e293b',
+                  offsetY: 8,
                   // @ts-ignore
                   formatter: function(val: string, opts: any) {
                     if (opts && opts.w && opts.w.config && typeof opts.seriesIndex !== 'undefined' && opts.w.config.series) {
@@ -130,9 +116,9 @@ export default function SimplePieChart({title, labels, series, height = 350, wid
                 total: {
                   show: true,
                   label: 'Total',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: 600,
-                  color: '#D3D3D3',
+                  color: isDarkMode ? '#f1f5f9' : '#1e293b',
                   formatter: (w: any) => {
                     const total = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0);
                     return formatValue(total);
@@ -143,12 +129,24 @@ export default function SimplePieChart({title, labels, series, height = 350, wid
           }
         },
         tooltip: {
-          theme: 'dark',
+          theme: isDarkMode ? 'dark' : 'light',
           style: {
-            fontSize: '12px'
+            fontSize: '13px',
+            fontFamily: 'Inter, sans-serif'
           },
           y: {
-            formatter: (val: number) => `${val}`
+            formatter: (val: number) => formatValue(val)
+          },
+          x: {
+            formatter: (val: number, opts: any) => {
+              if (opts && opts.w && opts.w.config && typeof opts.seriesIndex !== 'undefined') {
+                const seriesIndex = opts.seriesIndex;
+                const seriesValue = opts.w.config.series[seriesIndex];
+                const percentage = ((seriesValue / opts.w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0)) * 100).toFixed(1);
+                return `${val} (${percentage}%)`;
+              }
+              return val.toString();
+            }
           }
         },
         states: {
@@ -166,8 +164,9 @@ export default function SimplePieChart({title, labels, series, height = 350, wid
           }
         },
         stroke: {
-          width: 0,
-          lineCap: 'round'
+          width: 2,
+          lineCap: 'round',
+          colors: [isDarkMode ? '#1e293b' : '#ffffff']
         }
       };
 

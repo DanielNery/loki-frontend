@@ -210,12 +210,28 @@ export default function Home() {
     }
 
     return (
-        <div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
             <Header />
-            {/* Grid dinâmica de gráficos no topo, mantendo todos os gráficos já existentes */}
-            <div className="grid md:grid-cols-2 gap-4 mt-5">
+            
+            {/* Container principal */}
+            <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+                {/* Seção de boas-vindas */}
+                <div className="mb-12 animate-fade-in">
+                    <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+                        Dashboard Financeiro
+                    </h1>
+                    <p className="text-slate-600 dark:text-slate-400 text-lg">
+                        Acompanhe sua vida financeira e hábitos em tempo real
+                    </p>
+                </div>
+
+                {/* Grid de gráficos principais */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
                 {/* Gráfico de rosca de ativos */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                            Participação dos Ativos
+                        </h3>
                     {currentPositions && Object.keys(currentPositions).length > 0 && (() => {
                         const ativos = Object.entries(currentPositions)
                             .map(([k, v]) => [k, parseFloat(String(v).replace(/[^0-9\,\.\-]/g, '').replace(',', '.'))] as [string, number])
@@ -225,26 +241,30 @@ export default function Home() {
                         const series = ativos.map(([, v]) => v);
                         return (
                             <SimplePieChart
-                                title="Participação dos Ativos"
+                                    title=""
                                 labels={labels}
                                 series={series}
-                                height={500}
+                                    height={400}
                                 width={"100%"}
                                 valueFormatter={val => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 })}
                             />
                         );
                     })()}
                 </div>
+                    
                 {/* Gráfico de linha de receitas */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                            Evolução das Receitas
+                        </h3>
                     <LineChart
-                        title="Evolução das Receitas"
-                        color="#15c16b"
+                            title=""
+                            color="#22c55e"
                         data={extractToSeries(extractResume, 'total_receitas')}
                     />
                 </div>
                 {/* Gráfico de barras de hábitos */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <div className="chart-container animate-slide-up">
                     {notionLoading ? <LoadingSpinner /> : notionResume && (
                         <BarChart
                             title="Progresso por Hábito"
@@ -257,45 +277,59 @@ export default function Home() {
                                 notionResume.total_boxe_progress,
                                 notionResume.total_musculacao_progress,
                             ]}
-                            height={500}
+                                height={400}
                             width="100%"
                         />
                     )}
                 </div>
+                    
                 {/* Gráfico de linha de despesas */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <LineChart
                         title="Evolução das Despesas"
-                        color="#FF4560"
+                            color="#ef4444"
                         data={extractToSeries(extractResume, 'total_despesas')}
                     />
+                    </div>
                 </div>
+
+                {/* Segunda linha de gráficos */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
                 {/* Gráfico de área de evolução geral */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <AreaStackedChart
                         title="Evolução Receitas, Despesas, Investimentos e Saldo"
                         series={getExtractAreaSeries(extractResume)}
                         categories={extractMonths(extractResume)}
                     />
                 </div>
+                    
                 {/* Gráfico de linha de saldo */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <LineChart
                         title="Evolução do Saldo por Período"
-                        color="#007bff"
+                            color="#3b82f6"
                         data={extractToSeries(extractResume, 'saldo')}
                     />
+                    </div>
                 </div>
+
+                {/* Terceira linha de gráficos */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
                 {/* Gráfico de linha de investimentos */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <LineChart
                         title="Evolução dos Investimentos"
-                        color="#008FFB"
+                            color="#06b6d4"
                         data={extractToSeries(extractResume, 'total_investimentos')}
                     />
                 </div>
+                    
                 {/* Gráfico de rosca de hábitos */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                        Distribuição dos Hábitos
+                    </h3>
                     {notionLoading ? <LoadingSpinner /> : notionResume && (
                         <HabitsDonutChart
                             title=""
@@ -315,31 +349,36 @@ export default function Home() {
                                 notionResume.total_natacao_progress ?? 0,
                                 notionResume.total_corrida_progress ?? 0,
                             ]}
-                            height={500}
+                            height={400}
                             width="100%"
                         />
                     )}
                 </div>
+                </div>
+
+                {/* Quarta linha de gráficos */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
                 {/* Gráfico de linha de freelance */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <LineChart
                         title="Evolução do Freelance"
-                        color="#FEB019"
+                            color="#f59e0b"
                         data={extractToSeries(extractResume, 'total_freelance')}
                     />
                 </div>
+                    
                 {/* Gráfico de linha de imposto */}
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                    <div className="chart-container animate-slide-up">
                     <LineChart
                         title="Evolução do Imposto Aproximado"
-                        color="#775DD0"
+                            color="#8b5cf6"
                         data={extractToSeries(extractResume, 'imposto_aproximado')}
                     />
                 </div>
             </div>
-            {/* Gráficos de colunas em grid de duas colunas */}
-            <div className="mt-5 grid md:grid-cols-2 gap-4">
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                {/* Gráficos de barras mensais */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
+                    <div className="chart-container animate-slide-up">
                     <BarChart
                         title="Receitas Mensais"
                         categories={barData.categories}
@@ -348,7 +387,7 @@ export default function Home() {
                         width="100%"
                     />
                 </div>
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <div className="chart-container animate-slide-up">
                     <BarChart
                         title="Despesas Mensais"
                         categories={barData.categories}
@@ -357,7 +396,7 @@ export default function Home() {
                         width="100%"
                     />
                 </div>
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <div className="chart-container animate-slide-up">
                     <BarChart
                         title="Freelance Mensal"
                         categories={freelanceImpostoBarData.categories}
@@ -366,7 +405,7 @@ export default function Home() {
                         width="100%"
                     />
                 </div>
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50 w-full">
+                    <div className="chart-container animate-slide-up">
                     <BarChart
                         title="Imposto Aproximado Mensal"
                         categories={freelanceImpostoBarData.categories}
@@ -376,124 +415,235 @@ export default function Home() {
                     />
                 </div>
             </div>
-            {/* Cards e listas de totais/maiores receitas/despesas abaixo */}
-            <div className="mt-5">
-                <div className="grid md:grid-cols-3 gap-4">
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        {extractLoading ? <LoadingSpinner /> : extractTotals && (
+                {/* Seção de resumos e estatísticas */}
+                <div className="mb-12">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 animate-fade-in">
+                        Resumo Financeiro
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12">
+                        {extractLoading ? (
+                            <div className="col-span-full flex justify-center">
+                                <LoadingSpinner />
+                            </div>
+                        ) : extractTotals ? (
                             <>
-                                <Card title="Total Receitas" value={extractTotals.total_receitas} />
-                                <Card title="Total Despesas" value={extractTotals.total_despesas} />
-                                <Card title="Total Investimentos" value={extractTotals.total_investimentos} />
-                                <Card title="Total Freelance" value={extractTotals.total_freelance} />
-                                <Card title="Imposto Aproximado" value={extractTotals.imposto_aproximado} />
-                                <Card title="Saldo Final" value={extractTotals.saldo_final} />
-                                <Card title="Média Receitas" value={extractTotals.media_receitas_por_periodo} />
-                                <Card title="Média Despesas" value={extractTotals.media_despesas_por_periodo} />
+                                <Card 
+                                    title="Total Receitas" 
+                                    value={extractTotals.total_receitas} 
+                                    variant="success"
+                                    trend="up"
+                                />
+                                <Card 
+                                    title="Total Despesas" 
+                                    value={extractTotals.total_despesas} 
+                                    variant="danger"
+                                    trend="down"
+                                />
+                                <Card 
+                                    title="Total Investimentos" 
+                                    value={extractTotals.total_investimentos} 
+                                    variant="info"
+                                />
+                                <Card 
+                                    title="Saldo Final" 
+                                    value={extractTotals.saldo_final} 
+                                    variant={extractTotals.saldo_final?.includes('-') ? 'danger' : 'success'}
+                                />
                             </>
-                        )}
-                        {extractError && <p className="text-red-500">{extractError}</p>}
-                    </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        <h3 className="font-bold mb-2 text-red-400">Maiores Despesas</h3>
-                        {extractLoading ? <LoadingSpinner /> : (
-                            <div>
-                                {maioresDespesas.slice(0, 5).map((d, i) => (
-                                    <Card
-                                        key={i}
-                                        title={`${d.data?.slice(0, 10)} - ${d.descricao}`}
-                                        value={<span className="text-red-400 font-bold">{d.valor}</span>}
-                                    />
-                                ))}
+                        ) : null}
+                        {extractError && (
+                            <div className="col-span-full text-center">
+                                <p className="text-accent-600 dark:text-accent-400">{extractError}</p>
                             </div>
                         )}
                     </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        <h3 className="font-bold mb-2 text-green-400">Maiores Receitas</h3>
-                        {extractLoading ? <LoadingSpinner /> : (
-                            <div>
-                                {maioresReceitas.slice(0, 5).map((r, i) => (
-                                    <Card
-                                        key={i}
-                                        title={`${r.data?.slice(0, 10)} - ${r.descricao}`}
-                                        value={<span className="text-green-400 font-bold">{r.valor}</span>}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        <h3 className="font-bold mb-4 text-blue-400 flex items-center gap-2 text-lg">
-                            <FaRegCalendarCheck className="text-blue-400" /> Despesas Fixas
-                        </h3>
-                        {fixedExpensesLoading ? <LoadingSpinner /> : fixedExpensesError ? (
-                            <p className="text-red-500">{fixedExpensesError}</p>
-                        ) : fixedExpenses.length === 0 ? (
-                            <p>Nenhuma despesa fixa encontrada.</p>
-                        ) : (
-                            <ul className="divide-y divide-slate-800">
-                                {fixedExpenses.slice(0, 8).map((item, idx) => (
-                                    <li key={idx} className="py-3 flex flex-col gap-1">
-                                        <span className="font-bold text-base text-slate-200">{item.descricao}</span>
-                                        <span className="text-xs text-slate-400">Banco: <span className="font-semibold text-slate-300">{item.banco}</span></span>
-                                        <span className="text-xs text-slate-400">Meses: <span className="font-semibold text-slate-300">{item.meses_distintos}</span> | Ocorrências: <span className="font-semibold text-slate-300">{item.ocorrencias}</span></span>
-                                        <span className="text-lg font-bold text-red-400 mt-1">{Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                                    </li>
-                                ))}
-                            </ul>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {extractTotals && (
+                            <>
+                                <Card 
+                                    title="Total Freelance" 
+                                    value={extractTotals.total_freelance} 
+                                    variant="warning"
+                                />
+                                <Card 
+                                    title="Imposto Aproximado" 
+                                    value={extractTotals.imposto_aproximado} 
+                                    variant="danger"
+                                />
+                                <Card 
+                                    title="Média Receitas" 
+                                    value={extractTotals.media_receitas_por_periodo} 
+                                    variant="success"
+                                />
+                                <Card 
+                                    title="Média Despesas" 
+                                    value={extractTotals.media_despesas_por_periodo} 
+                                    variant="danger"
+                                />
+                            </>
                         )}
                     </div>
                 </div>
+                {/* Seção de maiores transações */}
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-12">
+                    {/* Maiores Despesas */}
+                    <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                        <div className="flex items-center mb-6">
+                            <div className="w-3 h-3 bg-accent-500 rounded-full mr-3"></div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Maiores Despesas</h3>
+                        </div>
+                        {extractLoading ? (
+                            <div className="flex justify-center py-8">
+                                <LoadingSpinner />
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {maioresDespesas.slice(0, 5).map((d, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 break-words leading-relaxed">
+                                                {d.descricao}
+                                            </p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                {d.data?.slice(0, 10)}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-lg font-bold text-accent-600 dark:text-accent-400">
+                                                {d.valor}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Maiores Receitas */}
+                    <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                        <div className="flex items-center mb-6">
+                            <div className="w-3 h-3 bg-success-500 rounded-full mr-3"></div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Maiores Receitas</h3>
+                        </div>
+                        {extractLoading ? (
+                            <div className="flex justify-center py-8">
+                                <LoadingSpinner />
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {maioresReceitas.slice(0, 5).map((r, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 break-words leading-relaxed">
+                                                {r.descricao}
+                                            </p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                {r.data?.slice(0, 10)}
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-lg font-bold text-success-600 dark:text-success-400">
+                                                {r.valor}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                {/* Despesas Fixas */}
+                <div className="glass-strong rounded-2xl p-6 animate-slide-up">
+                    <div className="flex items-center mb-6">
+                        <FaRegCalendarCheck className="text-primary-500 mr-3" />
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">Despesas Fixas</h3>
+                    </div>
+                    {fixedExpensesLoading ? (
+                        <div className="flex justify-center py-8">
+                            <LoadingSpinner />
+                        </div>
+                    ) : fixedExpensesError ? (
+                        <p className="text-accent-600 dark:text-accent-400 text-center">{fixedExpensesError}</p>
+                        ) : fixedExpenses.length === 0 ? (
+                        <p className="text-slate-500 dark:text-slate-400 text-center">Nenhuma despesa fixa encontrada.</p>
+                        ) : (
+                        <div className="space-y-4">
+                                {fixedExpenses.slice(0, 8).map((item, idx) => (
+                                <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-200">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h4 className="font-semibold text-slate-900 dark:text-slate-100">{item.descricao}</h4>
+                                        <span className="text-lg font-bold text-accent-600 dark:text-accent-400">
+                                            {Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center space-x-4 text-sm text-slate-500 dark:text-slate-400">
+                                        <span>Banco: <span className="font-medium text-slate-700 dark:text-slate-300">{item.banco}</span></span>
+                                        <span>Meses: <span className="font-medium text-slate-700 dark:text-slate-300">{item.meses_distintos}</span></span>
+                                        <span>Ocorrências: <span className="font-medium text-slate-700 dark:text-slate-300">{item.ocorrencias}</span></span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
             </div>
 
-            {/* Add the new InvestmentPositions component */}
-            <div className="mt-5">
-                <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
+                {/* Posições de Investimento */}
+                <div className="mb-12">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 animate-fade-in">
+                        Posições de Investimento
+                    </h2>
+                    <div className="glass-strong rounded-2xl p-6 animate-slide-up">
                     {investingLoading ? (
+                            <div className="flex justify-center py-8">
                         <LoadingSpinner />
+                            </div>
                     ) : currentPositions ? (
                         <InvestmentPositions positions={currentPositions} />
                     ) : null}
                 </div>
             </div>
 
-            {/* Habit Tracker - Notion */}
-            <div className="mt-5">
-                <div className="grid md:grid-cols-2 gap-4">
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+                {/* Resumo de Hábitos */}
+                <div className="mb-12">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8 animate-fade-in">
+                        Resumo de Hábitos
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                        {notionLoading ? (
+                            <div className="col-span-full flex justify-center">
+                                <LoadingSpinner />
+                            </div>
+                        ) : notionResume ? (
                             <>
-                                <Card title="Total de Hábitos" value={notionResume.total_habits} />
-                                <Card title="Completos" value={notionResume.total_habits_completed} />
-                                <Card title="Não Completos" value={notionResume.total_habits_not_completed} />
-                                <Card title="Progresso (%)" value={notionResume.total_habits_progress_percentage?.toFixed(2) + '%'} />
+                                <Card title="Total de Hábitos" value={notionResume.total_habits} variant="info" />
+                                <Card title="Completos" value={notionResume.total_habits_completed} variant="success" />
+                                <Card title="Não Completos" value={notionResume.total_habits_not_completed} variant="danger" />
+                                <Card title="Progresso (%)" value={notionResume.total_habits_progress_percentage?.toFixed(2) + '%'} variant="info" />
                             </>
-                        )}
-                        {notionError && <p className="text-red-500">{notionError}</p>}
+                        ) : null}
+                        {notionError && (
+                            <div className="col-span-full text-center">
+                                <p className="text-accent-600 dark:text-accent-400">{notionError}</p>
                     </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        {notionLoading ? <LoadingSpinner /> : notionResume && (
-                            <>
-                                <Card title="Jiu Jitsu" value={notionResume.total_jiu_jitsu_progress} />
-                                <Card title="Muay Thai" value={notionResume.total_muay_thai_progress} />
-                                <Card title="Boxe" value={notionResume.total_boxe_progress} />
-                                <Card title="Natação" value={notionResume.total_natacao_progress} />
-                                <Card title="Corrida" value={notionResume.total_corrida_progress} />
-                            </>
                         )}
                     </div>
-                    <div className="p-5 rounded-lg bg-white dark:bg-slate-950 dark:bg-opacity-50">
-                        {notionLoading ? <LoadingSpinner /> : notionResume && (
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6 mt-6">
+                        {notionResume && (
                             <>
-                                <Card title="Musculação" value={notionResume.total_musculacao_progress} />
-                                <Card title="Música" value={notionResume.total_musica_progress} />
-                                <Card title="Creatina" value={notionResume.total_creatina_progress} />
+                                <Card title="Jiu Jitsu" value={notionResume.total_jiu_jitsu_progress} variant="success" />
+                                <Card title="Muay Thai" value={notionResume.total_muay_thai_progress} variant="success" />
+                                <Card title="Boxe" value={notionResume.total_boxe_progress} variant="success" />
+                                <Card title="Natação" value={notionResume.total_natacao_progress} variant="success" />
+                                <Card title="Corrida" value={notionResume.total_corrida_progress} variant="success" />
+                                <Card title="Musculação" value={notionResume.total_musculacao_progress} variant="success" />
                             </>
                         )}
                     </div>
                 </div>
-            </div>
-
+            </main>
         </div>
     );
 }
