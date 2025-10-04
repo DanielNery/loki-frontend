@@ -90,7 +90,8 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             },
             markers: {
                 strokeWidth: 0,
-                size: 8
+                width: 8,
+                height: 8
             },
             itemMargin: {
                 horizontal: 8,
