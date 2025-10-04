@@ -88,11 +88,6 @@ export default function AreaStackedChart({ title, series, categories }: AreaStac
             labels: {
                 colors: isDarkMode ? '#94a3b8' : '#64748b'
             },
-            markers: {
-                strokeWidth: 0,
-                width: 8,
-                height: 8
-            },
             itemMargin: {
                 horizontal: 8,
                 vertical: 4
